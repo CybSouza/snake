@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-br">
+	<head>
+		<meta charset="utf-8"/>
+		<title>Jogo da Cobrinha</title>
+	</head>
+	<body>
+		<canvas id= "cv" width="400" height="400" style="border:10px solid #88AA0F;"></canvas>
+		<div>pontuação: <span id="score"></span></div>
+			<script type="text/javascript">
+				var cobra = [];
+				var posicaoCobraX = 10;
+				var posicaoCobraY = 10;
+				var grid = 20;
+				var comidaX=12;
+				var comidaY=15;
+				var MoveX=0;
+				var MoveY=0;
+				var tamanhoCobra=5;
+				var pontos=0;
+				
+				window.onload = function inicia(){
+					canvas = document.getElementById("cv");
+					contexto = canvas.getContext("2d");						
+					setInterval(jogo, 1000/10);//chama o jogo, define os frames por segundo
+				}
+				
+				document.addEventListener("keydown",function teclas(e){						
+					switch(e.keyCode){//usa o código das teclas pra mudar a direção
+						case 37://esquerda
+							if(MoveX != 1){
+							MoveX = -1;
+							MoveY = 0;}
+						break;
+						case 38://cima
+						if(MoveY != 1){
+							MoveX = 0;
+							MoveY = -1;}
+						break;
+						case 39://direita
+						if(MoveX != -1){
+							MoveX = 1;
+							MoveY = 0;}
+						break;
+						case 40://baixo
+						//debugger;
+						if(MoveY !=-1){
+							MoveX = 0;
+							MoveY = 1;}
+						break;
+					}//fecha o Switch case				
+				}//fecha a função das teclas
+				);//fecha o eventListener
+				
+				function movimento(){//soma~subtrai os valores definidos no switch case pra mudar a posição
+					
+					posicaoCobraX += MoveX;
+					posicaoCobraY += MoveY;
+				}
+				function Reiniciar(){//retorna à posição inicial e zera a velocidade
+					posicaoCobraX=10;
+					posicaoCobraY=10;
+					MoveX=0;
+					MoveY=0;
+					tamanhoCobra = 1;
+					pontos=0;					
+				}
+				
+				function ColideParede(){
+					if((posicaoCobraX < 0)||(posicaoCobraX > grid)||(posicaoCobraY < 0)||(posicaoCobraY > grid)){//verifica as posições que causariam a perda do jogo
+						Reiniciar();
+					}					
+				}
+				 
+				
+				function geraComida(){//Gera a comida em uma posição aleatória do Grid
+				comidaX = Math.floor(Math.random()*grid);
+				comidaY = Math.floor(Math.random()*grid);
+				}
+				function pontuacao(){//escreve a pontuação na div
+						 var div = document.getElementById("score"); 
+						 div.innerHTML = (pontos);						 
+						}
+				
+				function jogo(){	
+					movimento();
+					ColideParede();
+					pontuacao();
+					
+					contexto.fillStyle = " #AED603";//cor de fundo do canvas
+					contexto.fillRect(0,0, cv.width, cv.height);//colore o canvas									
+					contexto.fillStyle = "#323B2A";//cor da cobra
+					
+						for (var i = 0; i < cobra.length; i++){
+						//pinta o corpo da cobra; mantém o tamanho dela de acordo com o grid; faz os "espaços" entre uma parte do corpo e a outra; verifica se ela colidiu com o próprio corpo
+							contexto.fillRect(cobra[i].x * grid, cobra[i].y * grid, grid-1, grid-1);
+								if(cobra[i].x == posicaoCobraX && cobra[i].y == posicaoCobraY){			
+									Reiniciar();
+								}	
+						}								
+						
+						
+					cobra.push({x: posicaoCobraX, y:posicaoCobraY});//faz o corpo da cobra acompanhar o movimento
+					while(cobra.length>tamanhoCobra){
+						cobra.shift();
+					}
+					//trata a comida
+					contexto.fillStyle = "red";
+					contexto.fillRect(comidaX * grid, comidaY * grid, grid-1, grid-1);
+					
+					if(posicaoCobraX == comidaX && posicaoCobraY == comidaY){//trata o encontro da cobra com a comida
+						tamanhoCobra++;
+						pontos+=10;
+						geraComida();
+					}										
+				}
+</script>
+</body>
+</html>
